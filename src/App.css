@@ -1,0 +1,133 @@
+/* index.css의 #root 레이아웃 덮어쓰기 */
+#root {
+  width: 100%;
+  max-width: 100%;
+  border-inline: none;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+:root {
+  color-scheme: light;
+  background: #fff;
+  color: #111;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    background: #fff;
+    color: #111;
+    --bg: #fff;
+    --text: #111;
+    --text-h: #111;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #fff;
+}
+
+/* ── 앱 컨테이너 ── */
+.app-container {
+  width: min(100vw, 100vh);
+  height: min(100vw, 100vh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 16px;
+}
+
+/* ── 타이머 링 영역 ── */
+.ring-wrapper {
+  width: 80%;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+}
+
+/* ── 컨트롤 영역 ── */
+.controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── 버튼 공통 ── */
+button {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px 18px;
+  border: 1px solid #d1d1d1;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+button:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+button:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+
+/* ── 무음 토글 스위치 ── */
+.mute-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+
+.mute-toggle-label {
+  font-size: 14px;
+  color: #555;
+}
+
+.mute-toggle-track {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: #ccc;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.mute-toggle-track.on {
+  background: #AA0D4C;
+}
+
+.mute-toggle-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+}
+
+.mute-toggle-track.on .mute-toggle-thumb {
+  transform: translateX(20px);
+}
