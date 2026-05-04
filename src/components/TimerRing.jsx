@@ -123,7 +123,8 @@ export default function TimerRing({ totalSeconds, remainingSeconds, isRunning, o
         dominantBaseline="central"
         fill="#151D2A"
         fontWeight="bold"
-        fontSize="28"
+        fontSize="22"
+        fontFamily="Pretendard, system-ui, sans-serif"
       >
         {formatTime(remainingSeconds)}
       </text>

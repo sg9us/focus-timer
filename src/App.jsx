@@ -11,37 +11,19 @@ function formatTime(seconds) {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-function playChime() {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(440, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
-
-  gain.gain.setValueAtTime(0.4, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
-
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.8);
-  osc.onended = () => ctx.close();
-}
-
 export default function App() {
   const [totalSeconds, setTotalSeconds] = useState(300);
   const [isMuted, setIsMuted] = useState(false);
 
-  const handleComplete = useCallback(() => {
-    if (!isMuted) playChime();
+  const playSound = useCallback(() => {
+    if (isMuted) return;
+    const audio = new Audio('/focus-timer/alrm.MP3');
+    audio.play();
   }, [isMuted]);
 
   const { remainingSeconds, isRunning, start, pause, reset } = useTimer(
     totalSeconds,
-    handleComplete,
+    playSound,
   );
 
   // 탭 타이틀
