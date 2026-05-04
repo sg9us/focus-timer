@@ -5,7 +5,8 @@ const CY = 100;
 const R = 78;
 const MINOR_TICK_LEN = 4;
 const MAJOR_TICK_LEN = 8;
-const LABEL_R = R + MAJOR_TICK_LEN + 7; // ~93
+const LABEL_R = R + MAJOR_TICK_LEN + 7;
+const CENTER_DEAD_ZONE = 40; // radius: center click opens input, not time-set
 
 function formatTime(seconds) {
   const safe = Math.max(0, Math.floor(seconds));
@@ -42,11 +43,28 @@ const TICKS = Array.from({ length: 60 }, (_, i) => {
   };
 });
 
-const TEXT_STYLE = {
+const FONT_STYLE = {
   fontSize: '22px',
   fontWeight: 'bold',
   fontFamily: 'Pretendard, system-ui, sans-serif',
   color: '#151D2A',
+};
+
+const INPUT_STYLE = {
+  ...FONT_STYLE,
+  border: 'none',
+  outline: 'none',
+  background: 'transparent',
+  padding: 0,
+  width: '36px',
+  textAlign: 'center',
+};
+
+const COLON_STYLE = {
+  ...FONT_STYLE,
+  lineHeight: 1,
+  userSelect: 'none',
+  flexShrink: 0,
 };
 
 export default function TimerRing({ totalSeconds, remainingSeconds, isRunning, onTimeClick }) {
@@ -54,59 +72,84 @@ export default function TimerRing({ totalSeconds, remainingSeconds, isRunning, o
   const sectorPath = buildSectorPath(ratio);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const inputRef = useRef(null);
+  const [mmValue, setMmValue] = useState('');
+  const [ssValue, setSsValue] = useState('');
+  const mmRef = useRef(null);
+  const ssRef = useRef(null);
 
+  // Auto-focus MM input when entering edit mode
   useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
+    if (isEditing && mmRef.current) {
+      mmRef.current.focus();
+      mmRef.current.select();
     }
   }, [isEditing]);
 
-  // 타이머 시작 시 편집 모드 강제 종료
+  // Exit edit mode if timer starts
   useEffect(() => {
     if (isRunning) setIsEditing(false);
   }, [isRunning]);
 
-  const handleCenterClick = (e) => {
-    e.stopPropagation();
-    if (isRunning) return;
-    setInputValue(formatTime(remainingSeconds));
+  const openEditing = () => {
+    const safe = Math.max(0, remainingSeconds);
+    setMmValue(String(Math.floor(safe / 60)).padStart(2, '0'));
+    setSsValue(String(safe % 60).padStart(2, '0'));
     setIsEditing(true);
   };
 
-  const handleInputChange = (e) => {
-    const digits = e.target.value.replace(/\D/g, '').slice(0, 4);
-    setInputValue(digits.length <= 2 ? digits : `${digits.slice(0, 2)}:${digits.slice(2)}`);
-  };
-
   const commitInput = () => {
-    const digits = inputValue.replace(/\D/g, '').padStart(4, '0');
-    const mm = parseInt(digits.slice(0, 2), 10);
-    const ss = parseInt(digits.slice(2, 4), 10);
-    const total = Math.max(1, Math.min(3600, mm * 60 + ss));
+    const mm = Math.min(60, Math.max(0, parseInt(mmValue || '0', 10)));
+    const ss = Math.min(59, Math.max(0, parseInt(ssValue || '0', 10)));
+    const total = Math.max(1, Math.min(3600, mm * 60 + (mm >= 60 ? 0 : ss)));
     onTimeClick(total);
     setIsEditing(false);
   };
 
-  const handleTickClick = (e) => {
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') commitInput();
+    if (e.key === 'Escape') setIsEditing(false);
+  };
+
+  const handleMmChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 2);
+    setMmValue(digits);
+    if (digits.length === 2) {
+      ssRef.current?.focus();
+      ssRef.current?.select();
+    }
+  };
+
+  const handleSsChange = (e) => {
+    setSsValue(e.target.value.replace(/\D/g, '').slice(0, 2));
+  };
+
+  // Single click handler for the entire SVG
+  const handleSvgClick = (e) => {
     if (isRunning || !onTimeClick) return;
+    // While editing, outside clicks let blur handle commit — ignore for time-setting
+    if (isEditing) return;
 
     const svg = e.currentTarget;
     const pt = svg.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
     const { x, y } = pt.matrixTransform(svg.getScreenCTM().inverse());
-
     const dx = x - CX;
     const dy = y - CY;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist < R - 12 || dist > LABEL_R + 8) return;
 
+    // Center dead-zone → open input
+    if (dist < CENTER_DEAD_ZONE) {
+      openEditing();
+      return;
+    }
+
+    // Outside labels → ignore
+    if (dist > LABEL_R + 8) return;
+
+    // Inner ring + tick zone → snap to nearest minute
     let angle = Math.atan2(dy, dx) + Math.PI / 2;
     if (angle < 0) angle += 2 * Math.PI;
-
     const raw = Math.round((angle / (2 * Math.PI)) * 60);
     const minutes = raw === 0 ? 60 : Math.max(1, Math.min(60, raw));
     onTimeClick(minutes * 60);
@@ -119,7 +162,7 @@ export default function TimerRing({ totalSeconds, remainingSeconds, isRunning, o
       height="100%"
       preserveAspectRatio="xMidYMid meet"
       style={{ cursor: isRunning ? 'default' : 'pointer' }}
-      onClick={handleTickClick}
+      onClick={handleSvgClick}
       xmlns="http://www.w3.org/2000/svg"
     >
       <circle cx={CX} cy={CY} r={R} fill="#ffffff" />
@@ -138,28 +181,32 @@ export default function TimerRing({ totalSeconds, remainingSeconds, isRunning, o
       ))}
 
       {isEditing ? (
-        <foreignObject x={CX - 52} y={CY - 22} width={104} height={44}>
-          <div xmlns="http://www.w3.org/1999/xhtml" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+        <foreignObject x={CX - 50} y={CY - 22} width={100} height={44}>
+          <div
+            xmlns="http://www.w3.org/1999/xhtml"
+            onClick={(e) => e.stopPropagation()}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}
+          >
             <input
-              ref={inputRef}
+              ref={mmRef}
               type="text"
-              value={inputValue}
-              placeholder="MM:SS"
-              onChange={handleInputChange}
-              onBlur={commitInput}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') commitInput();
-                if (e.key === 'Escape') setIsEditing(false);
-              }}
-              style={{
-                ...TEXT_STYLE,
-                width: '100%',
-                textAlign: 'center',
-                border: 'none',
-                outline: 'none',
-                background: 'transparent',
-                padding: 0,
-              }}
+              inputMode="numeric"
+              value={mmValue}
+              onChange={handleMmChange}
+              onBlur={(e) => { if (e.relatedTarget !== ssRef.current) commitInput(); }}
+              onKeyDown={handleKeyDown}
+              style={INPUT_STYLE}
+            />
+            <span style={COLON_STYLE}>:</span>
+            <input
+              ref={ssRef}
+              type="text"
+              inputMode="numeric"
+              value={ssValue}
+              onChange={handleSsChange}
+              onBlur={(e) => { if (e.relatedTarget !== mmRef.current) commitInput(); }}
+              onKeyDown={handleKeyDown}
+              style={INPUT_STYLE}
             />
           </div>
         </foreignObject>
@@ -174,7 +221,6 @@ export default function TimerRing({ totalSeconds, remainingSeconds, isRunning, o
           fontSize="22"
           fontFamily="Pretendard, system-ui, sans-serif"
           style={{ cursor: isRunning ? 'default' : 'text' }}
-          onClick={handleCenterClick}
         >
           {formatTime(remainingSeconds)}
         </text>
