@@ -18,7 +18,7 @@ export default function App() {
   const playSound = useCallback(() => {
     if (isMuted) return;
     const audio = new Audio('/focus-timer/alrm.MP3');
-    audio.volume = 0.6;
+    audio.volume = 0.24;
     audio.play();
   }, [isMuted]);
 

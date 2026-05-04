@@ -5,7 +5,7 @@ const ghostStyle = (disabled) => ({
   border: 'none',
   background: 'none',
   color: '#151D2A',
-  opacity: disabled ? 0.2 : 0.4,
+  opacity: disabled ? 0.3 : 1,
   padding: '6px 12px',
 });
 
@@ -37,7 +37,7 @@ export default function TimerControls({
       <button onClick={isRunning ? onPause : onStart}>
         {isRunning ? 'Pause' : 'Start'}
       </button>
-      <button onClick={onReset}>Reset</button>
+      <button onClick={onReset} style={{ marginLeft: '4px' }}>Reset</button>
       <button
         onClick={() => adjustTime(60)}
         disabled={maxDisabled}
