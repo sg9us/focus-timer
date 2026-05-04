@@ -17,15 +17,15 @@ export default function TimerControls({
   return (
     <div>
       <button onClick={() => adjustTime(-60)} disabled={isRunning || totalSeconds <= MIN_SECONDS}>
-        -1분
+        -1m
       </button>
       <button onClick={() => adjustTime(60)} disabled={isRunning || totalSeconds >= MAX_SECONDS}>
-        +1분
+        +1m
       </button>
       <button onClick={isRunning ? onPause : onStart}>
-        {isRunning ? '일시정지' : '시작'}
+        {isRunning ? 'Pause' : 'Start'}
       </button>
-      <button onClick={onReset}>리셋</button>
+      <button onClick={onReset}>Reset</button>
     </div>
   );
 }

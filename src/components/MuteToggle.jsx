@@ -9,7 +9,7 @@ export default function MuteToggle({ isMuted, onToggle }) {
       onClick={onToggle}
       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onToggle()}
     >
-      <span className="mute-toggle-label">소리</span>
+      <span className="mute-toggle-label">Sound</span>
       <div className={`mute-toggle-track${isOn ? ' on' : ''}`}>
         <div className="mute-toggle-thumb" />
       </div>
