@@ -55,8 +55,9 @@ body {
 }
 
 /* ── 타이머 링 영역 ── */
+/* ring + controls(~90px) + gap(20px) + padding(32px) 이 컨테이너 높이 초과 방지 */
 .ring-wrapper {
-  width: 80%;
+  width: min(80%, calc(100svh - 150px));
   aspect-ratio: 1;
   flex-shrink: 0;
 }
