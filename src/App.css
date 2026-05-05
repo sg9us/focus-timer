@@ -52,7 +52,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  padding: 16px;
+  padding: 24px 0;
 }
 
 /* ── 타이머 링 영역 ── */
