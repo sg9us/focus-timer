@@ -4,7 +4,7 @@
   max-width: 100%;
   min-width: 0;
   border-inline: none;
-  min-height: auto;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
