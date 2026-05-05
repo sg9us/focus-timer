@@ -9,6 +9,7 @@
   align-items: center;
   justify-content: center;
   background: #fff;
+  padding: 24px 0;
 }
 
 :root {
@@ -52,7 +53,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  padding: 24px 0;
+  padding: 0;
 }
 
 /* ── 타이머 링 영역 ── */
