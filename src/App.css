@@ -9,6 +9,7 @@
   align-items: center;
   justify-content: center;
   background: #fff;
+  padding: 24px 0;
 }
 
 :root {
@@ -44,7 +45,6 @@ body {
 .app-container {
   width: min(100vw, calc(100vh - 48px));
   height: min(100vw, calc(100vh - 48px));
-  margin: 24px auto;
   min-width: 0;
   display: flex;
   flex-direction: column;
