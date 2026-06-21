@@ -30,6 +30,14 @@ export default function usePictureInPicture({ width = 300, height = 400 } = {}) 
     try {
       const pip = await window.documentPictureInPicture.requestWindow({ width, height });
       copyStyles(pip);
+      // #root의 flex 중앙 정렬을 portal 타겟인 body에도 동일하게 적용
+      Object.assign(pip.document.body.style, {
+        margin: '0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+      });
       pip.addEventListener('pagehide', () => setPipWindow(null), { once: true });
       setPipWindow(pip);
     } catch (err) {

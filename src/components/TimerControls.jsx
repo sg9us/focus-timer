@@ -26,7 +26,7 @@ export default function TimerControls({
   const maxDisabled = isRunning || totalSeconds >= MAX_SECONDS;
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
       <button
         onClick={() => adjustTime(-60)}
         disabled={minDisabled}
@@ -37,7 +37,7 @@ export default function TimerControls({
       <button onClick={isRunning ? onPause : onStart}>
         {isRunning ? 'Pause' : 'Start'}
       </button>
-      <button onClick={onReset} style={{ marginLeft: '4px' }}>Reset</button>
+      <button onClick={onReset}>Reset</button>
       <button
         onClick={() => adjustTime(60)}
         disabled={maxDisabled}
