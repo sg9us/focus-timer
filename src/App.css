@@ -136,3 +136,34 @@ button:disabled {
 .mute-toggle-track.on .mute-toggle-thumb {
   transform: translateX(20px);
 }
+
+/* ── 하단 행 (소리 토글 + PiP 버튼) ── */
+.bottom-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ── PiP 버튼 ── */
+.pip-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  outline: none;
+}
+
+.pip-button[aria-pressed="true"] {
+  opacity: 0.4;
+}
+
+/* ── PiP 활성 시 메인 탭에 보이는 안내 문구 ── */
+.pip-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  font-size: 14px;
+  color: #888;
+  text-align: center;
+  padding: 24px;
+}
